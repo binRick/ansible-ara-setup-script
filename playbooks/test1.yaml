@@ -1,0 +1,36 @@
+- name: Test playbook
+  hosts: localhost
+  vars:
+    ara_playbook_name: test 1
+    ara_playbook_labels:
+        - test
+        - one
+  tasks:
+    - name: Get git version of playbooks
+      command: git rev-parse HEAD
+      register: git_version
+
+    - name: Record git version
+      ara_record:
+        key: "git_version"
+        value: "{{ git_version.stdout }}"
+      register: version
+
+    - name: Print recorded data
+      debug: var=version
+
+    - name: Record different things
+      ara_record:
+        key: "{{ item.key }}"
+        value: "{{ item.value }}"
+        type: "{{ item.type }}"
+      loop:
+        - { key: "log", value: "error", type: "text" }
+        - { key: "website", value: "http://domain.tld", type: "url" }
+        - { key: "data", value: '{ "key": "value" }', type: "json" }
+        - { key: "somelist", value: ['one', 'two'], type: "list" }
+        - { key: "somedict", value: {'key': 'value' }, type: "dict" }
+
+#    - name: Print recorded data
+#      debug:
+#        msg: "{{ version.playbook_id }} - {{ version.key }}: {{ version.value }}
